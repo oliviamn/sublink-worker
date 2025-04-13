@@ -17,6 +17,7 @@ export class ProxyParser {
         return HttpParser.parse(url, userAgent);
       case 'trojan': return new TrojanParser().parse(url);
       case 'tuic': return new TuicParser().parse(url);
+      case 'tuic-v5': return new TuicV5Parser().parse(url);
 		}
 	}
 	}
@@ -229,7 +230,33 @@ export class ProxyParser {
         }
       }
       
-
+      class TuicV5Parser {
+        
+        parse(url) {
+          const { addressPart, params, name } = parseUrlParams(url);
+          const [userinfo, serverInfo] = addressPart.split('@');
+          const { host, port } = parseServerInfo(serverInfo);
+          const tls = {
+            enabled: true,
+            server_name: params.sni,
+            alpn: [params.alpn],
+            insecure: true,
+          };
+      
+          return {
+            tag: name,
+            type: "tuic-v5",
+            server: host,
+            server_port: port,
+            uuid: decodeURIComponent(userinfo.split(':')[0]),
+            password: decodeURIComponent(userinfo.split(':')[1]),
+            congestion_control: params.congestion_control,
+            tls: tls,
+            flow: params.flow ?? undefined
+          };
+        }
+      }
+      
       class HttpParser {
         static async parse(url, userAgent) {
             try {

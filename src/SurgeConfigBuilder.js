@@ -110,6 +110,24 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                     surgeProxy += `, udp-relay-mode=${proxy.udp_relay_mode}`;
                 }
                 break;
+            case 'tuic-v5':
+                surgeProxy = `${proxy.tag} = tuic-v5, ${proxy.server}, ${proxy.server_port}, password=${proxy.password}, uuid=${proxy.uuid}`;
+                if (proxy.tls?.server_name) {
+                    surgeProxy += `, sni=${proxy.tls.server_name}`;
+                }
+                if (proxy.tls?.alpn) {
+                    surgeProxy += `, alpn=${proxy.tls.alpn.join(',')}`;
+                }
+                // if (proxy.tls?.insecure) {
+                //     surgeProxy += ', skip-cert-verify=true';
+                // }
+                if (proxy.congestion_control) {
+                    surgeProxy += `, congestion-controller=${proxy.congestion_control}`;
+                }
+                if (proxy.udp_relay_mode) {
+                    surgeProxy += `, udp-relay-mode=${proxy.udp_relay_mode}`;
+                }
+                break;                
             default:
                 surgeProxy = `# ${proxy.tag} - Unsupported proxy type: ${proxy.type}`;
         }
