@@ -18,6 +18,7 @@ export class ProxyParser {
       case 'trojan': return new TrojanParser().parse(url);
       case 'tuic': return new TuicParser().parse(url);
       case 'tuic-v5': return new TuicV5Parser().parse(url);
+      case 'naive': return new NaiveProxyParser().parse(url);
 		}
 	}
 	}
@@ -295,4 +296,32 @@ export class ProxyParser {
                 return null;
             }
         }
+    }
+
+    // tuic-v5://1DDD6055-BC88-4086-A24A-B97324ADF140:ckdoacnioemskiwn@mainnode.xorbit.link:443?sni=mainnode.xorbit.link&alpn=h3&insecure=false#TUICNODESG
+    // naive://uid:pwd@domain:port?localport=1080#name
+    // NaiveProxy-GIA-US = external, exec = "/usr/local/naive/naive", local-port = 1080, 
+    // args = "--listen=socks://127.0.0.1:1080", args = "--proxy=https://ckdiwn:ckdoacnioemskiwn@gianode2.xorbit.link:8443"
+
+    class NaiveProxyParser {
+      parse(url) {
+        const { addressPart, params, name } = parseUrlParams(url);
+        const [userinfo, serverInfo] = addressPart.split('@');
+        const { host, port } = parseServerInfo(serverInfo);
+        const [username, password] = userinfo.split(':');
+        var exec_path = params.exec || "/usr/local/naive/naive";
+        console.log("exec_path", exec_path);
+        
+    
+        return {
+          tag: name,
+          type: "naive",
+          server: host,
+          server_port: parseInt(port),
+          username: decodeURIComponent(username),
+          password: decodeURIComponent(password),
+          local_port: parseInt(params.localport) || 1080,
+          local_exec_path: exec_path,
+        };
+      }
     }

@@ -128,6 +128,9 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                     surgeProxy += `, udp-relay-mode=${proxy.udp_relay_mode}`;
                 }
                 break;                
+            case 'naive':
+                surgeProxy = `${proxy.tag} = external, exec = "${proxy.local_exec_path}", local-port = ${proxy.local_port}, args = "--listen=socks://127.0.0.1:${proxy.local_port}", args = "--proxy=https://${proxy.username}:${proxy.password}@${proxy.server}:${proxy.server_port}"`;
+                break;
             default:
                 surgeProxy = `# ${proxy.tag} - Unsupported proxy type: ${proxy.type}`;
         }
