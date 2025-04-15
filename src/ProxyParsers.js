@@ -240,7 +240,7 @@ export class ProxyParser {
             enabled: true,
             server_name: params.sni,
             alpn: [params.alpn],
-            insecure: true,
+            insecure: params.insecure,
           };
       
           return {

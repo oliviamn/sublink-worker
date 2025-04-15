@@ -118,9 +118,9 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
                 if (proxy.tls?.alpn) {
                     surgeProxy += `, alpn=${proxy.tls.alpn.join(',')}`;
                 }
-                // if (proxy.tls?.insecure) {
-                //     surgeProxy += ', skip-cert-verify=true';
-                // }
+                if (proxy.tls?.insecure) {
+                    surgeProxy += ', skip-cert-verify=true';
+                }
                 if (proxy.congestion_control) {
                     surgeProxy += `, congestion-controller=${proxy.congestion_control}`;
                 }
@@ -148,14 +148,14 @@ export class SurgeConfigBuilder extends BaseConfigBuilder {
 
     addAutoSelectGroup(proxyList) {
         this.config['proxy-groups'] = this.config['proxy-groups'] || [];
-        this.config['proxy-groups'].push(
-            this.createProxyGroup(t('outboundNames.Auto Select'), 'url-test', [], ', url=http://www.gstatic.com/generate_204, interval=300')
-        );
+        // this.config['proxy-groups'].push(
+        //     this.createProxyGroup(t('outboundNames.Auto Select'), 'url-test', [], ', url=http://www.gstatic.com/generate_204, interval=300')
+        // );
     }
 
     addNodeSelectGroup(proxyList) {
         this.config['proxy-groups'].push(
-            this.createProxyGroup(t('outboundNames.Node Select'), 'select', [t('outboundNames.Auto Select')])
+            this.createProxyGroup(t('outboundNames.Node Select'), 'select')
         );
     }
 
