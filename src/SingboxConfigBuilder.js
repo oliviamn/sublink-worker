@@ -17,7 +17,7 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
     }
 
     getProxies() {
-        return this.config.outbounds.filter(outbound => outbound?.server != undefined);
+        return this.config.outbounds.filter(outbound => outbound?.server != undefined && outbound?.type != "naive");
     }
 
     getProxyName(proxy) {
@@ -25,11 +25,28 @@ export class SingboxConfigBuilder extends BaseConfigBuilder {
     }
 
     convertProxy(proxy) {
-        return proxy;
+        let singboxProxy = proxy;
+        switch (proxy.type) {
+            case "tuic-v5":
+                singboxProxy = DeepCopy(proxy);
+                singboxProxy.type = "tuic";
+                singboxProxy.congestion_control = "bbr";
+                if (singboxProxy.tls && "insecure" in singboxProxy.tls) {
+                    delete singboxProxy.tls.insecure;
+                }
+                break;
+        
+            default:
+                break;
+        }
+
+        return singboxProxy;
     }
 
     addProxyToConfig(proxy) {
-        this.config.outbounds.push(proxy);
+        if (proxy.type != "naive") {
+            this.config.outbounds.push(proxy);
+        }
     }
 
     addAutoSelectGroup(proxyList) {
